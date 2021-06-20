@@ -1,13 +1,13 @@
 # Mongo DB Model
 
-<!-- ### Session
+### Session
 - ID     string
 - UserID string
   - CreateSession(...)
   - ReadSession(sessionID string)
-  - DeleteSession(sessionID string) -->
+  - DeleteSession(sessionID string)
 
-<!-- ### User
+### User
 - ID             string
 - Username       string
 - GithubUsername string
@@ -20,9 +20,9 @@
   - ReadUserByUsername(username string)
   - ReadAllUsers(courseID string)
   - UpdateUser(userID string)
-  - DeleteUser(userID string) -->
+  - DeleteUser(userID string)
 
-<!-- ### Submission
+### Submission
 - ID           string
 - Results      string?
 - Status       string
@@ -32,9 +32,9 @@
   - ReadSubmission(submissionID string)
   - ReadAllSubmissions(userID string, assignmentID string)
   - UpdateSubmission(submissionID string)
-  - DeleteSubmission(submissionID string) -->
+  - DeleteSubmission(submissionID string)
 
-<!-- ### Assignment
+### Assignment
 - ID          string
 - Name        string
 - Description string
@@ -45,9 +45,9 @@
   - ReadAssignment(assignmentID string)
   - ReadAllAssignments(courseID string)
   - UpdateAssignment(assignmentID string)
-  - DeleteAssignment(assignmentID string) -->
+  - DeleteAssignment(assignmentID string)
 
-<!-- ### Course
+### Course
 - ID             string
 - Name           string
 - Description    string
@@ -56,7 +56,7 @@
   - ReadCourse(courseID string)
   - ReadAllCourses()
   - UpdateCourse(courseID string, ...)
-  - DeleteCourse(courseID string) -->
+  - DeleteCourse(courseID string)
 
 ### Request
 - ID          string
