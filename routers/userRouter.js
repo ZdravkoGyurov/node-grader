@@ -10,8 +10,7 @@ const userRouter = Router()
 
 userRouter.get('/', async (req, res) => {
     try {
-        const collection = usersCollection(req)
-        const users = await readUsers(collection)
+        const users = await readUsers(usersCollection(req))
         res.status(200).json(users)
     } catch (err) {
         sendErrorResponse(req, res, 500, `Server error: ${err.message}`, err)
@@ -34,8 +33,7 @@ userRouter.post('/', async (req, res) => {
         }
 
         try {
-            const collection = usersCollection(req)
-            user = await createUser(collection, user)
+            user = await createUser(usersCollection(req), user)
             delete user.password // dont return password
             res.status(201).location(`/api/users/${user.id}`).json(user)
         } catch(err) {
@@ -57,8 +55,7 @@ userRouter.get('/:userId', async (req, res) => {
     }
 
     try {
-        const collection = usersCollection(req)
-        const user = await readUser(collection, userId)
+        const user = await readUser(usersCollection(req), userId)
         res.json(user)
     } catch(err) {
         const message = `read from db failed`
@@ -84,8 +81,7 @@ userRouter.patch('/:userId', async (req, res) => {
         user.validate()
 
         try {
-            const collection = usersCollection(req)
-            user = await updateUser(collection, userId, user)
+            user = await updateUser(usersCollection(req), userId, user)
 
             res.json(user)
         } catch(err) {
@@ -104,8 +100,7 @@ userRouter.delete('/:userId', async (req, res) => {
     }
     
     try {
-        const collection = usersCollection(req)
-        await deleteUser(collection, userId)
+        await deleteUser(usersCollection(req), userId)
         res.status(204).end()
     } catch(err) {
         sendErrorResponse(req, res, 500, `read from db failed`, err)
