@@ -3,10 +3,12 @@ const { sendErrorResponse } = require("../errors")
 const { Assignment } = require("../models/assignment")
 const { isValidId } = require("../storage/db")
 const { createAssignment, readAssignments, readAssignmentById, deleteAssignment, updateAssignment } = require("../storage/assignmentStorage")
+const authn = require("../middleware/authn")
+const authz = require("../middleware/authz")
 
 const assignmentRouter = Router()
 
-assignmentRouter.get('/', async (req, res) => {
+assignmentRouter.get('/', authn, authz(['READ_ASSIGNMENTS']), async (req, res) => {
     try {
         const assignments = await readAssignments(assignmentsCollection(req))
         res.status(200).json(assignments)
@@ -15,7 +17,7 @@ assignmentRouter.get('/', async (req, res) => {
     }
 })
 
-assignmentRouter.post('/', async (req, res) => {
+assignmentRouter.post('/', authn, authz(['CREATE_ASSIGNMENT']), async (req, res) => {
     const assignmentBody = req.body
     
     try {
@@ -36,7 +38,7 @@ assignmentRouter.post('/', async (req, res) => {
     }
 })
 
-assignmentRouter.get('/:assignmentId', async (req, res) => {
+assignmentRouter.get('/:assignmentId', authn, authz(['READ_ASSIGNMENT']), async (req, res) => {
     const assignmentId = req.params.assignmentId
 
     if(!isValidId(assignmentId)) {
@@ -55,7 +57,7 @@ assignmentRouter.get('/:assignmentId', async (req, res) => {
     }
 })
 
-assignmentRouter.patch('/:assignmentId', async (req, res) => {
+assignmentRouter.patch('/:assignmentId', authn, authz(['UPDATE_ASSIGNMENT']), async (req, res) => {
     const assignmentId = req.params.assignmentId
     const assignmentBody = req.body
 
@@ -79,7 +81,7 @@ assignmentRouter.patch('/:assignmentId', async (req, res) => {
     }
 })
 
-assignmentRouter.delete('/:assignmentId', async (req, res) => {
+assignmentRouter.delete('/:assignmentId', authn, authz(['DELETE_ASSIGNMENT']), async (req, res) => {
     const assignmentId = req.params.assignmentId
 
     if(!isValidId(assignmentId)) {

@@ -5,12 +5,18 @@ const { sendErrorResponse } = require("../errors")
 const { User } = require("../models/user")
 const { isValidId } = require("../storage/db")
 const { createUser, readUsers, readUserById, deleteUser, updateUser } = require("../storage/userStorage")
+const authn = require("../middleware/authn")
+const authz = require("../middleware/authz")
 
 const userRouter = Router()
 
-userRouter.get('/', async (req, res) => {
+userRouter.get('/', authn, authz(['READ_USERS']), async (req, res) => {
     try {
         const users = await readUsers(usersCollection(req))
+        users.map(u => {
+            delete u.password
+            return u
+        })
         res.status(200).json(users)
     } catch (err) {
         sendErrorResponse(req, res, 500, `Server error: ${err.message}`, err)
@@ -21,8 +27,8 @@ userRouter.post('/', async (req, res) => {
     const userBody = req.body
     
     try {
-        let user = new User(userBody.id, userBody.username, userBody.githubUsername, userBody.fullname,
-            userBody.password)
+        let user = new User(userBody.id, userBody.username, userBody.githubUsername,
+            userBody.fullname, userBody.password)
         user.validate()
 
         try {
@@ -47,7 +53,7 @@ userRouter.post('/', async (req, res) => {
     }
 })
 
-userRouter.get('/:userId', async (req, res) => {
+userRouter.get('/:userId', authn, authz(['READ_USER']), async (req, res) => {
     const userId = req.params.userId
 
     if(!isValidId(userId)) {
@@ -56,6 +62,7 @@ userRouter.get('/:userId', async (req, res) => {
 
     try {
         const user = await readUserById(usersCollection(req), userId)
+        delete user.password
         res.json(user)
     } catch(err) {
         const message = `read from db failed`
@@ -66,7 +73,7 @@ userRouter.get('/:userId', async (req, res) => {
     }
 })
 
-userRouter.patch('/:userId', async (req, res) => {
+userRouter.patch('/:userId', authn, authz(['UPDATE_USER']), async (req, res) => {
     const userId = req.params.userId
     const userBody = req.body
 
@@ -91,7 +98,7 @@ userRouter.patch('/:userId', async (req, res) => {
     }
 })
 
-userRouter.delete('/:userId', async (req, res) => {
+userRouter.delete('/:userId', authn, authz(['DELETE_USER']), async (req, res) => {
     const userId = req.params.userId
 
     if(!isValidId(userId)) {

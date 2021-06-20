@@ -1,5 +1,6 @@
 const express = require('express');
 const { sendErrorResponse } = require('./errors');
+const authRouter = require('./routers/authRouter');
 const userRouter = require('./routers/userRouter');
 const courseRouter = require('./routers/courseRouter');
 const assignmentRouter = require('./routers/assignmentRouter');
@@ -10,6 +11,7 @@ const port = process.env.PORT || 8080;
 
 app.use(express.json())
 
+app.use('/api', authRouter)
 app.use('/api/users', userRouter)
 app.use('/api/courses', courseRouter)
 app.use('/api/assignments', assignmentRouter)

@@ -3,10 +3,12 @@ const { sendErrorResponse } = require("../errors")
 const { Course } = require("../models/course")
 const { isValidId } = require("../storage/db")
 const { createCourse, readCourses, readCourseById, deleteCourse, updateCourse } = require("../storage/courseStorage")
+const authn = require("../middleware/authn")
+const authz = require("../middleware/authz")
 
 const courseRouter = Router()
 
-courseRouter.get('/', async (req, res) => {
+courseRouter.get('/', authn, authz(['READ_COURSES']), async (req, res) => {
     try {
         const courses = await readCourses(coursesCollection(req))
         res.status(200).json(courses)
@@ -15,7 +17,7 @@ courseRouter.get('/', async (req, res) => {
     }
 })
 
-courseRouter.post('/', async (req, res) => {
+courseRouter.post('/', authn, authz(['CREATE_COURSE']), async (req, res) => {
     const courseBody = req.body
     
     try {
@@ -36,7 +38,7 @@ courseRouter.post('/', async (req, res) => {
     }
 })
 
-courseRouter.get('/:courseId', async (req, res) => {
+courseRouter.get('/:courseId', authn, authz(['READ_COURSE']), async (req, res) => {
     const courseId = req.params.courseId
 
     if(!isValidId(courseId)) {
@@ -55,7 +57,7 @@ courseRouter.get('/:courseId', async (req, res) => {
     }
 })
 
-courseRouter.patch('/:courseId', async (req, res) => {
+courseRouter.patch('/:courseId', authn, authz(['UPDATE_COURSE']), async (req, res) => {
     const courseId = req.params.courseId
     const courseBody = req.body
 
@@ -79,7 +81,7 @@ courseRouter.patch('/:courseId', async (req, res) => {
     }
 })
 
-courseRouter.delete('/:courseId', async (req, res) => {
+courseRouter.delete('/:courseId', authn, authz(['DELETE_COURSE']), async (req, res) => {
     const courseId = req.params.courseId
 
     if(!isValidId(courseId)) {
