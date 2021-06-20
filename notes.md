@@ -1,13 +1,12 @@
 # Mongo DB Model
 
-### Session
+### RevokedTokens ✔️
 - ID     string
-- UserID string
-  - CreateSession(...)
-  - ReadSession(sessionID string)
-  - DeleteSession(sessionID string)
+- Token string
+  - CreateToken(...)
+  - ReadToken(token string)
 
-### User
+### User ✔️
 - ID             string
 - Username       string
 - GithubUsername string
@@ -34,7 +33,7 @@
   - UpdateSubmission(submissionID string)
   - DeleteSubmission(submissionID string)
 
-### Assignment
+### Assignment ✔️
 - ID          string
 - Name        string
 - Description string
@@ -47,7 +46,7 @@
   - UpdateAssignment(assignmentID string)
   - DeleteAssignment(assignmentID string)
 
-### Course
+### Course ✔️
 - ID             string
 - Name           string
 - Description    string
