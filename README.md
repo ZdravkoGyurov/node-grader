@@ -57,13 +57,24 @@
   - UpdateCourse(courseID string, ...)
   - DeleteCourse(courseID string)
 
-### Request
+### PermissionRequest
 - ID          string
 - Name        string
 - Description string
-- Type        string - ask for permissions / ask to join course
 - Permissions []string
-- CourseID    string
+- Status      string
+- UserID
+  - CreateRequest(...)
+  - ReadRequest(requestID string)
+  - ReadAllRequests(userID string)
+  - UpdateRequest(requestID string)
+  - DeleteRequest(requestID string)
+
+### CourseRequest
+- ID          string
+- Name        string
+- Description string
+- CourseID    []string
 - Status      string
 - UserID
   - CreateRequest(...)
