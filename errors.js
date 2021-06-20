@@ -9,3 +9,9 @@ module.exports.sendErrorResponse = function(req, res, status, message, err) {
         error: err.message
     })
 }
+
+module.exports.to = function(promise){
+    return promise
+        .then((data) => [data, null])
+        .catch((err) => [null, err]);
+}

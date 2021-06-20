@@ -1,5 +1,7 @@
 const { Router } = require("express")
-const { sendErrorResponse } = require("../errors")
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+const { sendErrorResponse, to } = require("../errors")
 const { User } = require("../models/user")
 const { isValidId } = require("../storage/db")
 const { createUser, readUsers, readUser, deleteUser, updateUser } = require("../storage/userStorage")
@@ -24,10 +26,18 @@ userRouter.post('/', async (req, res) => {
             userBody.password, userBody.permissions, userBody.courseIds)
         user.validate()
 
+        const [hash, err] = await to(bcrypt.hash(user.password, saltRounds))
+        if (err) {
+            sendErrorResponse(req, res, 500, `error while generating hash`, err)
+            return
+        }
+
+        user.password = hash
+
         try {
             const collection = usersCollection(req)
             user = await createUser(collection, user)
-
+            delete user.password // dont return password
             res.status(201).location(`/api/users/${user.id}`).json(user)
         } catch(err) {
             if (err.message && err.message.includes('E11000')) {
@@ -71,6 +81,7 @@ userRouter.patch('/:userId', async (req, res) => {
     try {
         let user = new User(userBody.id, userBody.username, userBody.githubUsername, userBody.fullname,
             userBody.password, userBody.permissions, userBody.courseIds).removeEmptyFields()
+        delete user.password
         user.validate()
 
         try {
