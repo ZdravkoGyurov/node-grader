@@ -36,6 +36,7 @@ function filterByUsername(username) {
 
 module.exports.createUser = createUser
 module.exports.readUsers = readUsers
-module.exports.readUser = readUser
+module.exports.readUserById = readUserById
+module.exports.readUserByUsername = readUserByUsername
 module.exports.updateUser = updateUser
 module.exports.deleteUser = deleteUser

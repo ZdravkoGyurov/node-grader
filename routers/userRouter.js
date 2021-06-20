@@ -4,7 +4,7 @@ const saltRounds = 10;
 const { sendErrorResponse } = require("../errors")
 const { User } = require("../models/user")
 const { isValidId } = require("../storage/db")
-const { createUser, readUsers, readUser, deleteUser, updateUser } = require("../storage/userStorage")
+const { createUser, readUsers, readUserById, deleteUser, updateUser } = require("../storage/userStorage")
 
 const userRouter = Router()
 
@@ -22,7 +22,7 @@ userRouter.post('/', async (req, res) => {
     
     try {
         let user = new User(userBody.id, userBody.username, userBody.githubUsername, userBody.fullname,
-            userBody.password, userBody.permissions, userBody.courseIds)
+            userBody.password)
         user.validate()
 
         try {

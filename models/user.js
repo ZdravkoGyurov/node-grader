@@ -9,8 +9,8 @@ class User {
         this.githubUsername = githubUsername || ''
         this.fullname = fullname || ''
         this.password = password
-        this.permissions = permissions || []
-        this.courseIds = courseIds || []
+        this.permissions = permissions || [] 
+        this.courseIds = (courseIds && courseIds.map(p => ObjectID.createFromHexString(p))) || []
     }
 
     validate() {
