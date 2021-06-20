@@ -14,7 +14,7 @@
 - Fullname       string
 - Password       string
 - Permissions    []string
-- []CourseID     []string
+- CourseID       []string
   - CreateUser(...)
   - ReadUserByID(userID string)
   - ReadUserByUsername(username string)

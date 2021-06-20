@@ -10,8 +10,12 @@ async function readUsers(collection) {
     return readAll(collection)
 }
 
-async function readUser(collection, id) {
+async function readUserById(collection, id) {
     return read(collection, filterById(id), entityName)
+}
+
+async function readUserByUsername(collection, username) {
+    return read(collection, filterByUsername(username), entityName)
 }
 
 async function updateUser(collection, id, user) {
@@ -24,6 +28,10 @@ async function deleteUser(collection, id) {
 
 function filterById(id) {
     return { _id: new ObjectID(id) }
+}
+
+function filterByUsername(username) {
+    return { username: username }
 }
 
 module.exports.createUser = createUser

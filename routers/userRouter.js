@@ -55,7 +55,7 @@ userRouter.get('/:userId', async (req, res) => {
     }
 
     try {
-        const user = await readUser(usersCollection(req), userId)
+        const user = await readUserById(usersCollection(req), userId)
         res.json(user)
     } catch(err) {
         const message = `read from db failed`
