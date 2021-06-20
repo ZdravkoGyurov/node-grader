@@ -1,6 +1,7 @@
 const express = require('express');
 const { sendErrorResponse } = require('./errors');
 const userRouter = require('./routers/userRouter');
+const courseRouter = require('./routers/courseRouter');
 const { connect } = require('./storage/db');
 
 const app = express();
@@ -9,6 +10,7 @@ const port = process.env.PORT || 8080;
 app.use(express.json())
 
 app.use('/api/users', userRouter)
+app.use('/api/courses', courseRouter)
 
 app.use(function (err, req, res, next) {
     console.error(err.stack);

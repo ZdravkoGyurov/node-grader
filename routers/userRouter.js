@@ -82,7 +82,6 @@ userRouter.patch('/:userId', async (req, res) => {
 
         try {
             user = await updateUser(usersCollection(req), userId, user)
-
             res.json(user)
         } catch(err) {
             sendErrorResponse(req, res, 500, `error while inserting user in the database`, err)

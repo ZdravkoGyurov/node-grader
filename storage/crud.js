@@ -32,7 +32,7 @@ async function update(collection, filter, entity, entityName) {
         throw Error(`failed to update ${entityName} in the database`)
     }
 
-    return updateResult.value
+    return fixEntityId(updateResult.value, updateResult.value._id)
 }
 
 async function deleteBy(collection, filter, entityName) {

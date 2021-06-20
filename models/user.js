@@ -32,6 +32,9 @@ class User {
         if (this._id == null || this._id == undefined || this._id == '') {
             delete this._id
         }
+        if (this.id == null || this.id == undefined || this.id == '') {
+            delete this.id
+        }
         if (this.username == null || this.username == undefined || this.username == '') {
             delete this.username
         }
