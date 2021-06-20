@@ -1,4 +1,5 @@
-const { create, readAll, read, update, deleteEntity } = require("./crud")
+const { ObjectID } = require("bson")
+const { create, readAll, read, update, deleteBy } = require("./crud")
 const entityName = 'user'
 
 async function createUser(collection, user) {
@@ -10,15 +11,19 @@ async function readUsers(collection) {
 }
 
 async function readUser(collection, id) {
-    return read(collection, id, entityName)
+    return read(collection, filterById(id), entityName)
 }
 
 async function updateUser(collection, id, user) {
-    return update(collection, id, user, entityName)
+    return update(collection, filterById(id), user, entityName)
 }
 
 async function deleteUser(collection, id) {
-    return deleteEntity(collection, id, entityName)
+    return deleteBy(collection, filterById(id), entityName)
+}
+
+function filterById(id) {
+    return { _id: new ObjectID(id) }
 }
 
 module.exports.createUser = createUser
