@@ -1,7 +1,7 @@
 const { Router } = require("express")
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const { sendErrorResponse, to } = require("../errors")
+const { sendErrorResponse } = require("../errors")
 const { User } = require("../models/user")
 const { isValidId } = require("../storage/db")
 const { createUser, readUsers, readUser, deleteUser, updateUser } = require("../storage/userStorage")
@@ -26,13 +26,12 @@ userRouter.post('/', async (req, res) => {
             userBody.password, userBody.permissions, userBody.courseIds)
         user.validate()
 
-        const [hash, err] = await to(bcrypt.hash(user.password, saltRounds))
-        if (err) {
-            sendErrorResponse(req, res, 500, `error while generating hash`, err)
-            return
+        try {
+            const hash = await bcrypt.hash(user.password, saltRounds)
+            user.password = hash
+        } catch (err) {
+            return sendErrorResponse(req, res, 500, `error while generating hash`, err)
         }
-
-        user.password = hash
 
         try {
             const collection = usersCollection(req)
