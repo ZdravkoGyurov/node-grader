@@ -2,7 +2,7 @@ const { Router } = require("express")
 const { sendErrorResponse } = require("../errors")
 const { Submission, SubmissionStatus } = require("../models/submission")
 const { isValidId } = require("../storage/db")
-const { createSubmission, readSubmissionByUserIdAndAssignmentId, readSubmissionById, deleteSubmission, updateSubmission } = require("../storage/submissionStorage")
+const { createSubmission, readSubmissions, readSubmissionById, deleteSubmission, updateSubmission } = require("../storage/submissionStorage")
 const authn = require("../middleware/authn")
 const authz = require("../middleware/authz")
 
@@ -16,7 +16,7 @@ submissionRouter.get('/', authn, authz(['READ_SUBMISSIONS']), async (req, res) =
     }
 
     try {
-        const submissions = await readSubmissionByUserIdAndAssignmentId(submissionsCollection(req), req.userId, body.assignmentId)
+        const submissions = await readSubmissions(submissionsCollection(req), req.userId, body.assignmentId)
         res.status(200).json(submissions)
     } catch (err) {
         const message = `read from db failed`

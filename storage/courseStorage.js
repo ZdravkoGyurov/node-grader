@@ -7,7 +7,7 @@ async function createCourse(collection, course) {
 }
 
 async function readCourses(collection) {
-    return readAll(collection)
+    return readAll(collection, {})
 }
 
 async function readCourseById(collection, id) {

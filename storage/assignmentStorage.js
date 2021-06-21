@@ -7,7 +7,7 @@ async function createAssignment(collection, assignment) {
 }
 
 async function readAssignments(collection) {
-    return readAll(collection)
+    return readAll(collection, {})
 }
 
 async function readAssignmentById(collection, id) {

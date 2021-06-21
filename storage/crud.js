@@ -7,8 +7,8 @@ async function create(collection, entity, entityName) {
     }
 }
 
-async function readAll(collection) {
-    const entities = await collection.find().toArray()
+async function readAll(collection, filter) {
+    const entities = await collection.find(filter).toArray()
     return entities.map(e => fixEntityId(e, e._id))
 }
 

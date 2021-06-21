@@ -1,13 +1,13 @@
 const { ObjectID } = require("bson")
-const { create, read, update, deleteBy } = require("./crud")
+const { create, read, readAll, update, deleteBy } = require("./crud")
 const entityName = 'submission'
 
 async function createSubmission(collection, submission) {
     return create(collection, submission, entityName)
 }
 
-async function readSubmissionByUserIdAndAssignmentId(collection, userId, assignmentId) {
-    return read(collection, filterByUserIdAndAssignmentId(userId, assignmentId), entityName)
+async function readSubmissions(collection, userId, assignmentId) {
+    return readAll(collection, filterByUserIdAndAssignmentId(userId, assignmentId))
 }
 
 async function readSubmissionById(collection, id) {
@@ -32,7 +32,7 @@ function filterByUserIdAndAssignmentId(userId, assignmentId) {
 }
 
 module.exports.createSubmission = createSubmission
-module.exports.readSubmissionByUserIdAndAssignmentId = readSubmissionByUserIdAndAssignmentId
+module.exports.readSubmissions = readSubmissions
 module.exports.readSubmissionById = readSubmissionById
 module.exports.updateSubmission = updateSubmission
 module.exports.deleteSubmission = deleteSubmission

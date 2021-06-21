@@ -7,7 +7,7 @@ async function createUser(collection, user) {
 }
 
 async function readUsers(collection) {
-    return readAll(collection)
+    return readAll(collection, {})
 }
 
 async function readUserById(collection, id) {
