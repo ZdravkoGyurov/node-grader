@@ -59,8 +59,6 @@
 
 ### PermissionRequest
 - ID          string
-- Name        string
-- Description string
 - Permissions []string
 - Status      string
 - UserID
@@ -72,8 +70,6 @@
 
 ### CourseRequest
 - ID          string
-- Name        string
-- Description string
 - CourseID    []string
 - Status      string
 - UserID
