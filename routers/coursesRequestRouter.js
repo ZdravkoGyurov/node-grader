@@ -67,7 +67,11 @@ coursesRequestRouter.patch('/:coursesRequestId', authn, authz(['UPDATE_COURSESRE
 
             res.json(coursesRequest)
         } catch(err) {
-            sendErrorResponse(req, res, 500, `error while inserting coursesRequest in the database`, err)
+            const message = `error while updating coursesRequest in the database`
+            if (err.message && err.message.includes('does not exist')) {
+                return sendErrorResponse(req, res, 404, message, err)
+            }
+            sendErrorResponse(req, res, 500, message, err)
         }
     } catch (err) {
         sendErrorResponse(req, res, 400, `invalid coursesRequest data`, err)

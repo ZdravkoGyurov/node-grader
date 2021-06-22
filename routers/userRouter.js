@@ -91,7 +91,11 @@ userRouter.patch('/:userId', authn, authz(['UPDATE_USER']), async (req, res) => 
             user = await updateUser(usersCollection(req), userId, user)
             res.json(user)
         } catch(err) {
-            sendErrorResponse(req, res, 500, `error while inserting user in the database`, err)
+            const message = `error while updating user in the database`
+            if (err.message && err.message.includes('does not exist')) {
+                return sendErrorResponse(req, res, 404, message, err)
+            }
+            sendErrorResponse(req, res, 500, message, err)
         }
     } catch (err) {
         sendErrorResponse(req, res, 400, `invalid user data`, err)

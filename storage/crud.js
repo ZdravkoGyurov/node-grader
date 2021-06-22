@@ -15,7 +15,7 @@ async function readAll(collection, filter) {
 async function read(collection, filter, entityName) {
     const entity = await collection.findOne(filter)
     if (!entity) {
-        throw Error(`failed to read ${entityName}, does not exist`)
+        throw Error(`failed to read ${entityName}, does not exist in the database`)
     }
     return fixEntityId(entity, entity._id)
 }
@@ -28,8 +28,12 @@ async function update(collection, filter, entity, entityName) {
         { $set: entity },
         { returnDocument: 'after' }
     );
-    if (!updateResult.ok || !updateResult.lastErrorObject.updatedExisting) {
+    
+    if (!updateResult.ok) {
         throw Error(`failed to update ${entityName} in the database`)
+    }
+    if (!updateResult.lastErrorObject.updatedExisting) {
+        throw Error(`failed to update ${entityName}, does not exist in the database`)
     }
 
     return fixEntityId(updateResult.value, updateResult.value._id)

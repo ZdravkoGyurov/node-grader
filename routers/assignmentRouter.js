@@ -74,7 +74,11 @@ assignmentRouter.patch('/:assignmentId', authn, authz(['UPDATE_ASSIGNMENT']), as
 
             res.json(assignment)
         } catch(err) {
-            sendErrorResponse(req, res, 500, `error while inserting assignment in the database`, err)
+            const message = `error while updating assignment in the database`
+            if (err.message && err.message.includes('does not exist')) {
+                return sendErrorResponse(req, res, 404, message, err)
+            }
+            sendErrorResponse(req, res, 500, message, err)
         }
     } catch (err) {
         sendErrorResponse(req, res, 400, `invalid assignment data`, err)

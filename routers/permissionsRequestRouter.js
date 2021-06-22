@@ -67,7 +67,11 @@ permissionsRequestRouter.patch('/:permissionsRequestId', authn, authz(['UPDATE_P
 
             res.json(permissionsRequest)
         } catch(err) {
-            sendErrorResponse(req, res, 500, `error while inserting permissionsRequest in the database`, err)
+            const message = `error while updating permissionsRequest in the database`
+            if (err.message && err.message.includes('does not exist')) {
+                return sendErrorResponse(req, res, 404, message, err)
+            }
+            sendErrorResponse(req, res, 500, message, err)
         }
     } catch (err) {
         sendErrorResponse(req, res, 400, `invalid permissionsRequest data`, err)
