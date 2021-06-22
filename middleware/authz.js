@@ -16,6 +16,7 @@ module.exports = function authz(permissions) {
             if (!hasPermission) {
                 next({ status: 403, message: `no permissions` })
             }
+            req.githubUsername = user.githubUsername
             next()
         }
       });
