@@ -20,7 +20,7 @@ function authn(req, res, next) {
     jwt.verify(token, secret, function (error, decoded) {
       if (error) next({ status: 401, message: `token is invalid`, error })
       else {
-        const revokedTokensCollection = req.app.locals.db.collection('revoked_tokens')
+        const revokedTokensCollection = req.app.locals.db.collection('revokedTokens')
         revokedTokensCollection.findOne({ token: token }, function (error, user) {
             if (error) {
                 next({ status: 500, message: `server error`, error })

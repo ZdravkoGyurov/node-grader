@@ -1,23 +1,30 @@
 const ObjectID = require('mongodb').ObjectID
+const { RequestStatus } = require("./requestStatus")
 
 class CoursesRequest {
-    constructor(id, name, description, courseIds, status = 'PENDING', userId) {
-        if (id) {
-            this._id = ObjectID.createFromHexString(id)
-        }
-        this.name = name || ''
-        this.description = description || ''
-        this.courseIds = courseIds || []
-        this.status = status || ''
-        this.userId = (userId && ObjectID.createFromHexString(userId)) || ''
+    constructor(courseIds, status = RequestStatus.PENDING, userId) {
+        this.courseIds = courseIds
+        this.status = status
+        this.userId = ObjectID.createFromHexString(userId)
     }
 
     validate() {
-        if (this.name && this.name.length < 1) {
-            throw Error('name should not be empty')
+        if (!this.courseIds || this.courseIds.length == 0) {
+            throw Error(`courseIds cannot be empty`)
         }
-        if (this.description && this.description.length < 1) {
-            throw Error('description should not be empty')
+        this.courseIds.forEach(c => {
+            if (!ObjectID.isValid(c)) {
+                throw Error(`course id ${c} is invalid object id`)
+            }
+        })
+        if (this.status != RequestStatus.APPROVED && this.status != RequestStatus.PENDING && this.status != RequestStatus.DECLINED) {
+                throw Error(`status ${this.status} is invalid, must be one of [APPROVED, PENDING, DECLINED]`)
+        }
+    }
+
+    validatePatch() {
+        if (this.status != RequestStatus.APPROVED && this.status != RequestStatus.PENDING && this.status != RequestStatus.DECLINED) {
+                throw Error(`status ${this.status} is invalid, must be one of [APPROVED, PENDING, DECLINED]`)
         }
     }
 
@@ -27,12 +34,6 @@ class CoursesRequest {
         }
         if (this.id == null || this.id == undefined || this.id == '') {
             delete this.id
-        }
-        if (this.name == null || this.name == undefined || this.name == '') {
-            delete this.name
-        }
-        if (this.description == null || this.description == undefined || this.description == '') {
-            delete this.description
         }
         if (this.courseIds == null || this.courseIds == undefined || this.courseIds.length == 0) {
             delete this.courseIds

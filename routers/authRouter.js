@@ -49,7 +49,7 @@ authRouter.get('/logout', authn, async (req, res) => {
 
     try {
         try {
-            await createToken(req.app.locals.db.collection('revoked_tokens'), token)
+            await createToken(req.app.locals.db.collection('revokedTokens'), token)
             res.status(204).end()
         } catch(err) {
             sendErrorResponse(req, res, 500, `error while inserting token in the database`, err)
