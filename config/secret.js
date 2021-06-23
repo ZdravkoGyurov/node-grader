@@ -1,1 +1,1 @@
-module.exports.secret='my_secret';
+module.exports.secret = 'my_secret'

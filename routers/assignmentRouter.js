@@ -27,7 +27,7 @@ assignmentRouter.post('/', authn, authz(['CREATE_ASSIGNMENT']), async (req, res)
         try {
             assignment = await createAssignment(assignmentsCollection(req), assignment)
             res.status(201).location(`/api/assignments/${assignment.id}`).json(assignment)
-        } catch(err) {
+        } catch (err) {
             if (err.message && err.message.includes('E11000')) {
                 return sendErrorResponse(req, res, 409, `assignment already exists`, err)
             }
@@ -48,7 +48,7 @@ assignmentRouter.get('/:assignmentId', authn, authz(['READ_ASSIGNMENT']), async 
     try {
         const assignment = await readAssignmentById(assignmentsCollection(req), assignmentId)
         res.json(assignment)
-    } catch(err) {
+    } catch (err) {
         const message = `read from db failed`
         if (err.message && err.message.includes('does not exist')) {
             return sendErrorResponse(req, res, 404, message, err)
@@ -73,7 +73,7 @@ assignmentRouter.patch('/:assignmentId', authn, authz(['UPDATE_ASSIGNMENT']), as
             assignment = await updateAssignment(assignmentsCollection(req), assignmentId, assignment)
 
             res.json(assignment)
-        } catch(err) {
+        } catch (err) {
             const message = `error while updating assignment in the database`
             if (err.message && err.message.includes('does not exist')) {
                 return sendErrorResponse(req, res, 404, message, err)
@@ -95,7 +95,7 @@ assignmentRouter.delete('/:assignmentId', authn, authz(['DELETE_ASSIGNMENT']), a
     try {
         await deleteAssignment(assignmentsCollection(req), assignmentId)
         res.status(204).end()
-    } catch(err) {
+    } catch (err) {
         sendErrorResponse(req, res, 500, `read from db failed`, err)
     }
 })

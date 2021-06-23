@@ -21,7 +21,7 @@
   - UpdateUser(userID string)
   - DeleteUser(userID string)
 
-### Submission
+### Submission ✔️
 - ID           string
 - Results      string?
 - Status       string
@@ -57,7 +57,7 @@
   - UpdateCourse(courseID string, ...)
   - DeleteCourse(courseID string)
 
-### PermissionRequest
+### PermissionRequest ✔️
 - ID          string
 - Permissions []string
 - Status      string
@@ -68,7 +68,7 @@
   - UpdateRequest(requestID string)
   - DeleteRequest(requestID string)
 
-### CourseRequest
+### CourseRequest ✔️
 - ID          string
 - CourseID    []string
 - Status      string

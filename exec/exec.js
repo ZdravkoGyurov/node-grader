@@ -3,7 +3,7 @@ const childProcess = require("child_process")
 async function runTests(imageName, containerName, assignment, solutionGitUser, solutionGitRepo, testsGitUser, testsGitRepo, dockerfile) {
     try {
         await buildDockerImage(imageName, assignment, solutionGitUser, solutionGitRepo, testsGitUser, testsGitRepo, dockerfile)
-    } catch(err) {
+    } catch (err) {
         console.error("failed to build docker image", err)
         throw err
     }
@@ -11,11 +11,11 @@ async function runTests(imageName, containerName, assignment, solutionGitUser, s
     let runDockerImageOut
     try {
         runDockerImageOut = await runDockerImage(containerName, imageName)
-    } catch(err) {
+    } catch (err) {
         console.error("failed to run docker image", err)
         try {
             await removeDockerImage(imageName)
-        } catch(err) {
+        } catch (err) {
             console.error("failed to remove docker image", err)
             throw err
         }
@@ -28,7 +28,7 @@ async function runTests(imageName, containerName, assignment, solutionGitUser, s
         console.error("failed to remove docker container", err)
         try {
             await removeDockerImage(imageName)
-        } catch(err) {
+        } catch (err) {
             console.error("failed to remove docker image", err)
             throw err
         }
@@ -47,7 +47,6 @@ async function runTests(imageName, containerName, assignment, solutionGitUser, s
 
 function buildDockerImage(imageName, assignment, solutionGitUser, solutionGitRepo, testsGitUser, testsGitRepo, dockerfile) {
     const buildDockerImageCommand = `docker build --no-cache -t ${imageName} --build-arg assignment=${assignment} --build-arg solutionGitUser=${solutionGitUser} --build-arg solutionGitRepo=${solutionGitRepo} --build-arg testsGitUser=${testsGitUser} --build-arg testsGitRepo=${testsGitRepo} ${dockerfile}`
-    console.log("buildDockerImageCommand", buildDockerImageCommand);
     return exec(buildDockerImageCommand)
 }
 
@@ -66,11 +65,11 @@ function removeDockerImage(imageName) {
 function exec(command) {
     return new Promise((resolve, reject) => {
         childProcess.exec(command, {}, (err, stdout, stderr) => {
-        if (err) {
-            console.log(stderr)
-            return reject(err)
-        }
-        return resolve(stdout)
+            if (err) {
+                console.log(stderr)
+                return reject(err)
+            }
+            return resolve(stdout)
         })
     })
 }

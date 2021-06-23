@@ -1,6 +1,6 @@
 const { Router } = require("express")
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const bcrypt = require('bcrypt')
+const saltRounds = 10
 const { sendErrorResponse } = require("../errors")
 const { User } = require("../models/user")
 const { isValidId } = require("../storage/db")
@@ -42,7 +42,7 @@ userRouter.post('/', async (req, res) => {
             user = await createUser(usersCollection(req), user)
             delete user.password // dont return password
             res.status(201).location(`/api/users/${user.id}`).json(user)
-        } catch(err) {
+        } catch (err) {
             if (err.message && err.message.includes('E11000')) {
                 return sendErrorResponse(req, res, 409, `user already exists`, err)
             }
@@ -64,7 +64,7 @@ userRouter.get('/:userId', authn, authz(['READ_USER']), async (req, res) => {
         const user = await readUserById(usersCollection(req), userId)
         delete user.password
         res.json(user)
-    } catch(err) {
+    } catch (err) {
         const message = `read from db failed`
         if (err.message && err.message.includes('does not exist')) {
             return sendErrorResponse(req, res, 404, message, err)
@@ -90,7 +90,7 @@ userRouter.patch('/:userId', authn, authz(['UPDATE_USER']), async (req, res) => 
         try {
             user = await updateUser(usersCollection(req), userId, user)
             res.json(user)
-        } catch(err) {
+        } catch (err) {
             const message = `error while updating user in the database`
             if (err.message && err.message.includes('does not exist')) {
                 return sendErrorResponse(req, res, 404, message, err)
@@ -112,7 +112,7 @@ userRouter.delete('/:userId', authn, authz(['DELETE_USER']), async (req, res) =>
     try {
         await deleteUser(usersCollection(req), userId)
         res.status(204).end()
-    } catch(err) {
+    } catch (err) {
         sendErrorResponse(req, res, 500, `read from db failed`, err)
     }
 })

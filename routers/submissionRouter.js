@@ -47,26 +47,26 @@ submissionRouter.post('/', authn, authz(['CREATE_SUBMISSION']), async (req, res)
                     const course = await readCourseById(coursesCollection(req), assignment.courseId)
                     try {
                         const submissionResults = await runTests("randomstring", "randomstring", assignment.name, req.githubUsername, course.githubRepoName, "ZdravkoGyurov", "grader-docker-tests", "./exec/.")
-                        console.log("submissionResults", submissionResults);
+                        console.log("submissionResults", submissionResults)
                         submission.results =submissionResults
                         submission.status = SubmissionStatus.DONE
                         updateSubmission(submissionsCollection(req), submission.id, submission)
                             .then(submission => {
                                 console.log(submission)
                             })
-                            .catch(err => {
+                            .catch (err => {
                                 console.error(err)
                             })
                     } catch (err) {
                         console.error(err)
                     }
                 } catch (err) {
-                    console.error(err);
+                    console.error(err)
                 }
             } catch (err) {
-                console.error(err);
+                console.error(err)
             }
-        } catch(err) {
+        } catch (err) {
             if (err.message && err.message.includes('E11000')) {
                 return sendErrorResponse(req, res, 409, `submission already exists`, err)
             }
@@ -87,7 +87,7 @@ submissionRouter.get('/:submissionId', authn, authz(['READ_SUBMISSION']), async 
     try {
         const submission = await readSubmissionById(submissionsCollection(req), submissionId)
         res.json(submission)
-    } catch(err) {
+    } catch (err) {
         const message = `read from db failed`
         if (err.message && err.message.includes('does not exist')) {
             return sendErrorResponse(req, res, 404, message, err)
@@ -106,7 +106,7 @@ submissionRouter.delete('/:submissionId', authn, authz(['DELETE_SUBMISSION']), a
     try {
         await deleteSubmission(submissionsCollection(req), submissionId)
         res.status(204).end()
-    } catch(err) {
+    } catch (err) {
         sendErrorResponse(req, res, 500, `read from db failed`, err)
     }
 })

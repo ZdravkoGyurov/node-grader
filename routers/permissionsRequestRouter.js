@@ -37,7 +37,7 @@ permissionsRequestRouter.post('/', authn, authz(['CREATE_PERMISSIONSREQUEST']), 
         try {
             permissionsRequest = await createPermissionsRequest(permissionsRequestsCollection(req), permissionsRequest)
             res.status(202).location(`/api/permissionsRequests/${permissionsRequest.id}`).json(permissionsRequest)
-        } catch(err) {
+        } catch (err) {
             if (err.message && err.message.includes('E11000')) {
                 return sendErrorResponse(req, res, 409, `permissionsRequest already exists`, err)
             }
@@ -66,7 +66,7 @@ permissionsRequestRouter.patch('/:permissionsRequestId', authn, authz(['UPDATE_P
             permissionsRequest = await updatePermissionsRequest(permissionsRequestsCollection(req), permissionsRequestId, permissionsRequest)
 
             res.json(permissionsRequest)
-        } catch(err) {
+        } catch (err) {
             const message = `error while updating permissionsRequest in the database`
             if (err.message && err.message.includes('does not exist')) {
                 return sendErrorResponse(req, res, 404, message, err)
@@ -88,7 +88,7 @@ permissionsRequestRouter.delete('/:permissionsRequestId', authn, authz(['DELETE_
     try {
         await deletePermissionsRequest(permissionsRequestsCollection(req), permissionsRequestId)
         res.status(204).end()
-    } catch(err) {
+    } catch (err) {
         sendErrorResponse(req, res, 500, `read from db failed`, err)
     }
 })

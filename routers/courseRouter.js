@@ -27,7 +27,7 @@ courseRouter.post('/', authn, authz(['CREATE_COURSE']), async (req, res) => {
         try {
             course = await createCourse(coursesCollection(req), course)
             res.status(201).location(`/api/courses/${course.id}`).json(course)
-        } catch(err) {
+        } catch (err) {
             if (err.message && err.message.includes('E11000')) {
                 return sendErrorResponse(req, res, 409, `course already exists`, err)
             }
@@ -48,7 +48,7 @@ courseRouter.get('/:courseId', authn, authz(['READ_COURSE']), async (req, res) =
     try {
         const course = await readCourseById(coursesCollection(req), courseId)
         res.json(course)
-    } catch(err) {
+    } catch (err) {
         const message = `read from db failed`
         if (err.message && err.message.includes('does not exist')) {
             return sendErrorResponse(req, res, 404, message, err)
@@ -73,7 +73,7 @@ courseRouter.patch('/:courseId', authn, authz(['UPDATE_COURSE']), async (req, re
             course = await updateCourse(coursesCollection(req), courseId, course)
 
             res.json(course)
-        } catch(err) {
+        } catch (err) {
             const message = `error while updating course in the database`
             if (err.message && err.message.includes('does not exist')) {
                 return sendErrorResponse(req, res, 404, message, err)
@@ -95,7 +95,7 @@ courseRouter.delete('/:courseId', authn, authz(['DELETE_COURSE']), async (req, r
     try {
         await deleteCourse(coursesCollection(req), courseId)
         res.status(204).end()
-    } catch(err) {
+    } catch (err) {
         sendErrorResponse(req, res, 500, `read from db failed`, err)
     }
 })

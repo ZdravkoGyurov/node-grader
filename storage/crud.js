@@ -1,10 +1,9 @@
 async function create(collection, entity, entityName) {
     const insertResult = await collection.insertOne(entity)
-    if (insertResult.result.ok && insertResult.insertedCount === 1) {
-        return fixEntityId(entity, insertResult.insertedId)
-    } else {
+    if (!insertResult.result.ok || insertResult.insertedCount !== 1) {
         throw Error(`failed to insert ${entityName} in the database`)
     }
+    return fixEntityId(entity, insertResult.insertedId)
 }
 
 async function readAll(collection, filter) {
@@ -22,12 +21,11 @@ async function read(collection, filter, entityName) {
 
 async function update(collection, filter, entity, entityName) {
     delete entity._id
-
     const updateResult = await collection.findOneAndUpdate(
         filter,
         { $set: entity },
         { returnDocument: 'after' }
-    );
+    )
     
     if (!updateResult.ok) {
         throw Error(`failed to update ${entityName} in the database`)
@@ -47,7 +45,7 @@ async function deleteBy(collection, filter, entityName) {
 }
 
 function fixEntityId(e, newId) {
-    e = {'id': newId, ...e}
+    e = { 'id': newId, ...e }
     delete e._id
     return e
 }

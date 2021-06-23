@@ -1,17 +1,17 @@
 const { Router } = require("express")
 const { sendErrorResponse } = require("../errors")
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const bcrypt = require('bcrypt')
+const saltRounds = 10
 const { readUserByUsername } = require("../storage/userStorage")
 const { createToken } = require("../storage/tokenStorage")
-const jwt = require('jsonwebtoken');
-const secret = require('../config/secret').secret;
+const jwt = require('jsonwebtoken')
+const secret = require('../config/secret').secret
 const authn = require("../middleware/authn")
 
 const authRouter = Router()
 
 authRouter.get('/login', async (req, res) => {
-    const authorizationHeader = req.headers['authorization'];
+    const authorizationHeader = req.headers['authorization']
     if(!authorizationHeader) {
         return sendErrorResponse(req, res, 401, `no authorization header`)
     }
@@ -29,7 +29,7 @@ authRouter.get('/login', async (req, res) => {
             }
             const token = jwt.sign({id: user.id}, secret, {
                 expiresIn: 86400 //expires in 24 h
-            });
+            })
             res.status(200).json({'accessToken': token})
         } catch (err) {
             return sendErrorResponse(req, res, 401, `wrong password`, err)
@@ -40,7 +40,7 @@ authRouter.get('/login', async (req, res) => {
 })
 
 authRouter.get('/logout', authn, async (req, res) => {
-    const authorizationHeader = req.headers['authorization'];
+    const authorizationHeader = req.headers['authorization']
     if (!authorizationHeader ||  authorizationHeader.split(' ')[0].trim() !== 'Bearer') {
         return sendErrorResponse(req, res, 401, `no authorization header`)
     }
@@ -51,7 +51,7 @@ authRouter.get('/logout', authn, async (req, res) => {
         try {
             await createToken(req.app.locals.db.collection('revokedTokens'), token)
             res.status(204).end()
-        } catch(err) {
+        } catch (err) {
             sendErrorResponse(req, res, 500, `error while inserting token in the database`, err)
         }
     } catch (err) {

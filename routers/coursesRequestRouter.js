@@ -37,7 +37,7 @@ coursesRequestRouter.post('/', authn, authz(['CREATE_COURSESREQUEST']), async (r
         try {
             coursesRequest = await createCoursesRequest(coursesRequestsCollection(req), coursesRequest)
             res.status(202).location(`/api/coursesRequests/${coursesRequest.id}`).json(coursesRequest)
-        } catch(err) {
+        } catch (err) {
             if (err.message && err.message.includes('E11000')) {
                 return sendErrorResponse(req, res, 409, `coursesRequest already exists`, err)
             }
@@ -66,7 +66,7 @@ coursesRequestRouter.patch('/:coursesRequestId', authn, authz(['UPDATE_COURSESRE
             coursesRequest = await updateCoursesRequest(coursesRequestsCollection(req), coursesRequestId, coursesRequest)
 
             res.json(coursesRequest)
-        } catch(err) {
+        } catch (err) {
             const message = `error while updating coursesRequest in the database`
             if (err.message && err.message.includes('does not exist')) {
                 return sendErrorResponse(req, res, 404, message, err)
@@ -88,7 +88,7 @@ coursesRequestRouter.delete('/:coursesRequestId', authn, authz(['DELETE_COURSESR
     try {
         await deleteCoursesRequest(coursesRequestsCollection(req), coursesRequestId)
         res.status(204).end()
-    } catch(err) {
+    } catch (err) {
         sendErrorResponse(req, res, 500, `read from db failed`, err)
     }
 })
