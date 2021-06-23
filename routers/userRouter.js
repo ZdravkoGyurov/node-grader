@@ -3,10 +3,11 @@ const bcrypt = require('bcrypt')
 const saltRounds = 10
 const { sendErrorResponse } = require("../errors")
 const { User } = require("../models/user")
-const { isValidId } = require("../storage/db")
+const { isValidId, isExistingId } = require("../storage/db")
 const { createUser, readUsers, readUserById, deleteUser, updateUser } = require("../storage/userStorage")
 const authn = require("../middleware/authn")
 const authz = require("../middleware/authz")
+const { ALL_PERMISSIONS } = require("../models/permissions")
 
 const userRouter = Router()
 
@@ -27,9 +28,10 @@ userRouter.post('/', async (req, res) => {
     const userBody = req.body
     
     try {
-        let user = new User(userBody.id, userBody.username, userBody.githubUsername,
-            userBody.fullname, userBody.password)
+        let user = new User(userBody.username, userBody.githubUsername, userBody.fullname, userBody.password)
         user.validate()
+        user.permissions = ALL_PERMISSIONS
+        user.courseIds = []
 
         try {
             const hash = await bcrypt.hash(user.password, saltRounds)
@@ -82,10 +84,16 @@ userRouter.patch('/:userId', authn, authz(['UPDATE_USER']), async (req, res) => 
     }
 
     try {
-        let user = new User(userBody.id, userBody.username, userBody.githubUsername, userBody.fullname,
+        await validateCourseIds(userBody.courseIds, coursesCollection(req))
+    } catch (err) {
+        return sendErrorResponse(req, res, 400, `invalid user data`, err)
+    }
+
+    try {
+        let user = new User(userBody.username, userBody.githubUsername, userBody.fullname,
             userBody.password, userBody.permissions, userBody.courseIds).removeEmptyFields()
         delete user.password
-        user.validate()
+        user.validatePatch()
 
         try {
             user = await updateUser(usersCollection(req), userId, user)
@@ -119,6 +127,24 @@ userRouter.delete('/:userId', authn, authz(['DELETE_USER']), async (req, res) =>
 
 function usersCollection(req) {
     return req.app.locals.db.collection('users')
+}
+
+function coursesCollection(req) {
+    return req.app.locals.db.collection('courses')
+}
+
+async function validateCourseIds(courseIds, coursesCollection) {
+    if (!courseIds || courseIds.length === 0) return
+
+    const exist = []
+    courseIds.forEach(c => {
+        exist.push(isExistingId(c, coursesCollection, 'course'))
+    })
+    try {
+        await Promise.all(exist)
+    } catch (err) {
+        throw err
+    }
 }
 
 module.exports = userRouter
