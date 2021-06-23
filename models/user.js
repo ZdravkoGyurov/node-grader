@@ -11,28 +11,28 @@ class User {
     }
 
     validate() {
-        if (!this.username || this.username.length === 0) {
+        if (!this.username.trim()) {
             throw Error('username should not be empty')
         }
-        if (!this.githubUsername || this.githubUsername.length === 0) {
+        if (!this.githubUsername.trim()) {
             throw Error('githubUsername should not be empty')
         }
-        if (!this.fullname || this.fullname.length === 0) {
+        if (!this.fullname.trim()) {
             throw Error('fullname should not be empty')
         }
-        if (!this.password || this.password.length === 0) {
+        if (!this.password.trim()) {
             throw Error('password should not be empty')
         }
     }
 
     validatePatch() {
-        if (this.username && this.username.length === 0) {
+        if (!this.name || !this.name.trim()) {
             throw Error('username should not be empty')
         }
-        if (this.githubUsername && this.githubUsername.length === 0) {
+        if (!this.githubUsername || !this.githubUsername.trim()) {
             throw Error('githubUsername should not be empty')
         }
-        if (this.fullname && this.fullname.length === 0) {
+        if (!this.fullname || !this.fullname.trim()) {
             throw Error('fullname should not be empty')
         }
         if (this.password) {
