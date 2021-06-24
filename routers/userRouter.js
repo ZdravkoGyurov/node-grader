@@ -8,6 +8,7 @@ const { createUser, readUsers, readUserById, deleteUser, updateUser } = require(
 const authn = require("../middleware/authn")
 const authz = require("../middleware/authz")
 const { ALL_PERMISSIONS } = require("../models/permissions")
+const { ObjectID } = require("bson")
 
 const userRouter = Router()
 
@@ -90,8 +91,9 @@ userRouter.patch('/:userId', authn, authz(['UPDATE_USER']), async (req, res) => 
     }
 
     try {
+        const courseIds = userBody.courseIds.map(c => new ObjectID(c))
         let user = new User(userBody.username, userBody.githubUsername, userBody.fullname,
-            userBody.password, userBody.permissions, userBody.courseIds).removeEmptyFields()
+            userBody.password, userBody.permissions, courseIds).removeEmptyFields()
         delete user.password
         user.validatePatch()
 

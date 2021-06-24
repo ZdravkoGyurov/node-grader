@@ -1,11 +1,12 @@
 const { Router } = require("express")
 const { sendErrorResponse } = require("../errors")
 const { CoursesRequest } = require("../models/coursesRequest")
-const { isValidId } = require("../storage/db")
+const { isValidId, isExistingId } = require("../storage/db")
 const { createCoursesRequest, readCoursesRequests, deleteCoursesRequest, updateCoursesRequest } = require("../storage/coursesRequestStorage")
 const authn = require("../middleware/authn")
 const authz = require("../middleware/authz")
 const { RequestStatus } = require("../models/requestStatus")
+const { ObjectID } = require("bson")
 
 const coursesRequestRouter = Router()
 
@@ -31,7 +32,18 @@ coursesRequestRouter.post('/', authn, authz(['CREATE_COURSESREQUEST']), async (r
     const body = req.body
     
     try {
-        let coursesRequest = new CoursesRequest(body.courseIds, RequestStatus.PENDING, req.userId)
+        await validateCourseId(body.courseId, coursesCollection(req))
+    } catch (err) {
+        return sendErrorResponse(req, res, 400, `invalid coursesRequest data`, err)
+    }
+    try {
+        await validateUserId(req.userId, usersCollection(req))
+    } catch (err) {
+        return sendErrorResponse(req, res, 400, `invalid coursesRequest data`, err)
+    }
+
+    try {
+        let coursesRequest = new CoursesRequest(new ObjectID(body.courseId), RequestStatus.PENDING, new ObjectID(req.userId))
         coursesRequest.validate()
 
         try {
@@ -56,15 +68,18 @@ coursesRequestRouter.patch('/:coursesRequestId', authn, authz(['UPDATE_COURSESRE
         return sendErrorResponse(req, res, 400, `invalid coursesRequest data`, new Error('invalid coursesRequest id'))
     }
 
+    if (body.courseId != null) {
+        return sendErrorResponse(req, res, 400, `courseId cannot be changed`)
+    }
+
     try {
-        let coursesRequest = new CoursesRequest(body.courseIds, body.status, req.userId).removeEmptyFields()
+        let coursesRequest = new CoursesRequest(new ObjectID(body.courseId), body.status, new ObjectID(req.userId)).removeEmptyFields()
         coursesRequest.validatePatch()
-        delete coursesRequest.courseIds
+        delete coursesRequest.courseId
         delete coursesRequest.userId
 
         try {
             coursesRequest = await updateCoursesRequest(coursesRequestsCollection(req), coursesRequestId, coursesRequest)
-
             res.json(coursesRequest)
         } catch (err) {
             const message = `error while updating coursesRequest in the database`
@@ -95,6 +110,22 @@ coursesRequestRouter.delete('/:coursesRequestId', authn, authz(['DELETE_COURSESR
 
 function coursesRequestsCollection(req) {
     return req.app.locals.db.collection('coursesRequests')
+}
+
+function coursesCollection(req) {
+    return req.app.locals.db.collection('courses')
+}
+
+function usersCollection(req) {
+    return req.app.locals.db.collection('users')
+}
+
+async function validateCourseId(courseId, coursesCollection) {
+    await isExistingId(courseId, coursesCollection, 'course')
+}
+
+async function validateUserId(userId, usersCollection) {
+    await isExistingId(userId, usersCollection, 'user')
 }
 
 module.exports = coursesRequestRouter

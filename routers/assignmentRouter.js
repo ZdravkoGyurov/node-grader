@@ -5,6 +5,7 @@ const { isValidId, isExistingId } = require("../storage/db")
 const { createAssignment, readAssignments, readAssignmentById, deleteAssignment, updateAssignment } = require("../storage/assignmentStorage")
 const authn = require("../middleware/authn")
 const authz = require("../middleware/authz")
+const { ObjectID } = require("bson")
 
 const assignmentRouter = Router()
 
@@ -27,7 +28,7 @@ assignmentRouter.post('/', authn, authz(['CREATE_ASSIGNMENT']), async (req, res)
     }
 
     try {
-        let assignment = new Assignment(assignmentBody.name, assignmentBody.description, assignmentBody.dueDate, assignmentBody.courseId)
+        let assignment = new Assignment(assignmentBody.name, assignmentBody.description, assignmentBody.dueDate, new ObjectID(assignmentBody.courseId))
         assignment.validate()
 
         try {
@@ -80,7 +81,7 @@ assignmentRouter.patch('/:assignmentId', authn, authz(['UPDATE_ASSIGNMENT']), as
     }
 
     try {
-        let assignment = new Assignment(assignmentBody.name, assignmentBody.description, assignmentBody.dueDate, assignmentBody.courseId).removeEmptyFields()
+        let assignment = new Assignment(assignmentBody.name, assignmentBody.description, assignmentBody.dueDate, new ObjectID(assignmentBody.courseId)).removeEmptyFields()
         assignment.validatePatch()
 
         try {
