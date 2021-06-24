@@ -14,7 +14,7 @@ exports.connect = async (app) => {
 
 async function isExistingId(id, collection, entityName) {
     if (!isValidId(id)) {
-        throw Error(`id '${id}' is invalid`)
+        throw Error(`${entityName} id '${id}' is invalid`)
     }
     try {
         const entity = await read(collection, filterById(id), entityName)

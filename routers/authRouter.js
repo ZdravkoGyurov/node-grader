@@ -1,7 +1,6 @@
 const { Router } = require("express")
 const { sendErrorResponse } = require("../errors")
 const bcrypt = require('bcrypt')
-const saltRounds = 10
 const { readUserByUsername } = require("../storage/userStorage")
 const { createToken } = require("../storage/tokenStorage")
 const jwt = require('jsonwebtoken')
@@ -28,9 +27,11 @@ authRouter.get('/login', async (req, res) => {
                 return sendErrorResponse(req, res, 401, `wrong password`)
             }
             delete user.password
+
             const token = jwt.sign({id: user.id}, secret, {
-                expiresIn: 86400 // expires in 24 h
+                expiresIn: 86400 // 24h
             })
+
             res.status(200).json({ user: user, 'accessToken': token })
         } catch (err) {
             return sendErrorResponse(req, res, 401, `wrong password`, err)
