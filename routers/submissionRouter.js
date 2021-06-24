@@ -1,13 +1,14 @@
 const { Router } = require("express")
 const { sendErrorResponse } = require("../errors")
 const { Submission, SubmissionStatus } = require("../models/submission")
-const { isValidId } = require("../storage/db")
+const { isValidId, isExistingId } = require("../storage/db")
 const { createSubmission, readSubmissions, readSubmissionById, deleteSubmission, updateSubmission, readAllSubmissions } = require("../storage/submissionStorage")
 const { readAssignmentById } = require("../storage/assignmentStorage")
 const { readCourseById } = require("../storage/courseStorage")
 const authn = require("../middleware/authn")
 const authz = require("../middleware/authz")
 const { runTests } = require("../exec/exec")
+const { ObjectID } = require("bson")
 
 const submissionRouter = Router()
 
@@ -37,10 +38,20 @@ submissionRouter.get('/', authn, authz(['READ_SUBMISSIONS']), async (req, res) =
 
 submissionRouter.post('/', authn, authz(['CREATE_SUBMISSION']), async (req, res) => {
     const body = req.body
-    
+
     try {
-        let submission = new Submission(req.userId, body.assignmentId)
-        submission.validate()
+        await validateAssignmentId(body.assignmentId, assignmentsCollection(req))
+    } catch (err) {
+        return sendErrorResponse(req, res, 400, `invalid submission data`, err)
+    }
+    try {
+        await validateUserId(req.userId, usersCollection(req))
+    } catch (err) {
+        return sendErrorResponse(req, res, 400, `invalid submission data`, err)
+    }
+
+    try {
+        let submission = new Submission(new ObjectID(req.userId), new ObjectID(body.assignmentId))
 
         try {
             submission = await createSubmission(submissionsCollection(req), submission)
@@ -51,7 +62,7 @@ submissionRouter.post('/', authn, authz(['CREATE_SUBMISSION']), async (req, res)
                 try {
                     const course = await readCourseById(coursesCollection(req), assignment.courseId)
                     try {
-                        const submissionResults = await runTests("randomstring", "randomstring", assignment.name, req.githubUsername, course.githubRepoName, "ZdravkoGyurov", "grader-docker-tests", "./exec/.")
+                        const submissionResults = await runTests(randomString(), randomString(), assignment.name, req.githubUsername, course.githubRepoName, "ZdravkoGyurov", "grader-docker-tests", "./exec/.")
                         console.log("submissionResults", submissionResults)
                         submission.results =submissionResults
                         submission.status = SubmissionStatus.DONE
@@ -126,6 +137,22 @@ function assignmentsCollection(req) {
 
 function submissionsCollection(req) {
     return req.app.locals.db.collection('submissions')
+}
+
+function usersCollection(req) {
+    return req.app.locals.db.collection('users')
+}
+
+async function validateAssignmentId(assignmentId, assignmentsCollection) {
+    await isExistingId(assignmentId, assignmentsCollection, 'assignment')
+}
+
+async function validateUserId(userId, usersCollection) {
+    await isExistingId(userId, usersCollection, 'user')
+}
+
+function randomString() {
+    return new ObjectID().toHexString()
 }
 
 module.exports = submissionRouter
