@@ -27,10 +27,11 @@ authRouter.get('/login', async (req, res) => {
             if (!passwordMatches) {
                 return sendErrorResponse(req, res, 401, `wrong password`)
             }
+            delete user.password
             const token = jwt.sign({id: user.id}, secret, {
-                expiresIn: 86400 //expires in 24 h
+                expiresIn: 86400 // expires in 24 h
             })
-            res.status(200).json({'accessToken': token})
+            res.status(200).json({ user: user, 'accessToken': token })
         } catch (err) {
             return sendErrorResponse(req, res, 401, `wrong password`, err)
         }
