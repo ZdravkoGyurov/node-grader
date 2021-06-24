@@ -11,7 +11,7 @@ const authRouter = Router()
 
 authRouter.get('/login', async (req, res) => {
     const authorizationHeader = req.headers['authorization']
-    if(!authorizationHeader) {
+    if (!authorizationHeader) {
         return sendErrorResponse(req, res, 401, `no authorization header`)
     }
 
@@ -43,8 +43,11 @@ authRouter.get('/login', async (req, res) => {
 
 authRouter.get('/logout', authn, async (req, res) => {
     const authorizationHeader = req.headers['authorization']
-    if (!authorizationHeader ||  authorizationHeader.split(' ')[0].trim() !== 'Bearer') {
+    if (!authorizationHeader) {
         return sendErrorResponse(req, res, 401, `no authorization header`)
+    }
+    if (authorizationHeader.split(' ')[0].trim() !== 'Bearer') {
+        return sendErrorResponse(req, res, 401, `expected Bearer token`)
     }
 
     const token = authorizationHeader.split(' ')[1]
@@ -54,10 +57,14 @@ authRouter.get('/logout', authn, async (req, res) => {
             await createToken(req.app.locals.db.collection('revokedTokens'), token)
             res.status(204).end()
         } catch (err) {
-            sendErrorResponse(req, res, 500, `error while inserting token in the database`, err)
+            console.error(`error while inserting token '${token}' in the database`)
+            console.error(err)
+            res.status(204).end()
         }
     } catch (err) {
-        sendErrorResponse(req, res, 500, `Server error: ${err.message}`, err)
+        console.error(`Server error: ${err.message}`)
+        console.error(err)
+        res.status(204).end()
     }
 })
 
