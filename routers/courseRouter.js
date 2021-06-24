@@ -21,7 +21,7 @@ courseRouter.post('/', authn, authz(['CREATE_COURSE']), async (req, res) => {
     const courseBody = req.body
     
     try {
-        let course = new Course(courseBody.id, courseBody.name, courseBody.description, courseBody.githubRepoName)
+        let course = new Course(courseBody.name, courseBody.description, courseBody.githubRepoName)
         course.validate()
 
         try {
@@ -66,8 +66,8 @@ courseRouter.patch('/:courseId', authn, authz(['UPDATE_COURSE']), async (req, re
     }
 
     try {
-        let course = new Course(courseBody.id, courseBody.name, courseBody.description, courseBody.githubRepoName).removeEmptyFields()
-        course.validate()
+        let course = new Course(courseBody.name, courseBody.description, courseBody.githubRepoName).removeEmptyFields()
+        course.validatePatch()
 
         try {
             course = await updateCourse(coursesCollection(req), courseId, course)

@@ -32,7 +32,7 @@ class User {
         if (this.githubUsername && !this.githubUsername.trim()) {
             throw Error('githubUsername should not be empty')
         }
-        if (!this.fullname && !this.fullname.trim()) {
+        if (this.fullname && !this.fullname.trim()) {
             throw Error('fullname should not be empty')
         }
         if (this.password) {
