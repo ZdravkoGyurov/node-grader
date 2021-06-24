@@ -2,7 +2,7 @@ const { Router } = require("express")
 const { sendErrorResponse } = require("../errors")
 const { Submission, SubmissionStatus } = require("../models/submission")
 const { isValidId } = require("../storage/db")
-const { createSubmission, readSubmissions, readSubmissionById, deleteSubmission, updateSubmission } = require("../storage/submissionStorage")
+const { createSubmission, readSubmissions, readSubmissionById, deleteSubmission, updateSubmission, readAllSubmissions } = require("../storage/submissionStorage")
 const { readAssignmentById } = require("../storage/assignmentStorage")
 const { readCourseById } = require("../storage/courseStorage")
 const authn = require("../middleware/authn")
@@ -10,6 +10,15 @@ const authz = require("../middleware/authz")
 const { runTests } = require("../exec/exec")
 
 const submissionRouter = Router()
+
+submissionRouter.get('/all', authn, authz(['READ_ALL_SUBMISSIONS']), async (req, res) => {
+    try {
+        const submissions = await readAllSubmissions(submissionsCollection(req))
+        res.status(200).json(submissions)
+    } catch (err) {
+        sendErrorResponse(req, res, 500, message, err)
+    }
+})
 
 submissionRouter.get('/', authn, authz(['READ_SUBMISSIONS']), async (req, res) => {
     const body = req.body
@@ -22,11 +31,7 @@ submissionRouter.get('/', authn, authz(['READ_SUBMISSIONS']), async (req, res) =
         const submissions = await readSubmissions(submissionsCollection(req), req.userId, body.assignmentId)
         res.status(200).json(submissions)
     } catch (err) {
-        const message = `read from db failed`
-        if (err.message && err.message.includes('does not exist')) {
-            return sendErrorResponse(req, res, 404, message, err)
-        }
-        sendErrorResponse(req, res, 500, message, err)
+        sendErrorResponse(req, res, 500, `read from db failed`, err)
     }
 })
 

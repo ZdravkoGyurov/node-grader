@@ -6,6 +6,10 @@ async function createSubmission(collection, submission) {
     return create(collection, submission, entityName)
 }
 
+async function readAllSubmissions(collection) {
+    return readAll(collection, {})
+}
+
 async function readSubmissions(collection, userId, assignmentId) {
     return readAll(collection, filterByUserIdAndAssignmentId(userId, assignmentId))
 }
@@ -32,6 +36,7 @@ function filterByUserIdAndAssignmentId(userId, assignmentId) {
 }
 
 module.exports.createSubmission = createSubmission
+module.exports.readAllSubmissions = readAllSubmissions
 module.exports.readSubmissions = readSubmissions
 module.exports.readSubmissionById = readSubmissionById
 module.exports.updateSubmission = updateSubmission
