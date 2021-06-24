@@ -1,11 +1,12 @@
 const { Router } = require("express")
 const { sendErrorResponse } = require("../errors")
 const { PermissionsRequest } = require("../models/permissionsRequest")
-const { isValidId } = require("../storage/db")
+const { isValidId, isExistingId } = require("../storage/db")
 const { createPermissionsRequest, readPermissionsRequests, deletePermissionsRequest, updatePermissionsRequest } = require("../storage/permissionsRequestStorage")
 const authn = require("../middleware/authn")
 const authz = require("../middleware/authz")
 const { RequestStatus } = require("../models/requestStatus")
+const { ObjectID } = require("bson")
 
 const permissionsRequestRouter = Router()
 
@@ -31,7 +32,13 @@ permissionsRequestRouter.post('/', authn, authz(['CREATE_PERMISSIONSREQUEST']), 
     const body = req.body
     
     try {
-        let permissionsRequest = new PermissionsRequest(body.permissions, RequestStatus.PENDING, req.userId)
+        await validateUserId(req.userId, usersCollection(req))
+    } catch (err) {
+        return sendErrorResponse(req, res, 400, `invalid coursesRequest data`, err)
+    }
+
+    try {
+        let permissionsRequest = new PermissionsRequest(body.permissions, RequestStatus.PENDING, new ObjectID(req.userId))
         permissionsRequest.validate()
 
         try {
@@ -57,14 +64,12 @@ permissionsRequestRouter.patch('/:permissionsRequestId', authn, authz(['UPDATE_P
     }
 
     try {
-        let permissionsRequest = new PermissionsRequest(body.permissions, body.status, req.userId).removeEmptyFields()
+        let permissionsRequest = new PermissionsRequest(body.permissions, body.status, new ObjectID(req.userId)).removeEmptyFields()
         permissionsRequest.validatePatch()
-        delete permissionsRequest.permissions
         delete permissionsRequest.userId
 
         try {
             permissionsRequest = await updatePermissionsRequest(permissionsRequestsCollection(req), permissionsRequestId, permissionsRequest)
-
             res.json(permissionsRequest)
         } catch (err) {
             const message = `error while updating permissionsRequest in the database`
@@ -95,6 +100,14 @@ permissionsRequestRouter.delete('/:permissionsRequestId', authn, authz(['DELETE_
 
 function permissionsRequestsCollection(req) {
     return req.app.locals.db.collection('permissionsRequests')
+}
+
+function usersCollection(req) {
+    return req.app.locals.db.collection('users')
+}
+
+async function validateUserId(userId, usersCollection) {
+    await isExistingId(userId, usersCollection, 'user')
 }
 
 module.exports = permissionsRequestRouter
