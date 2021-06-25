@@ -58,26 +58,7 @@ submissionRouter.post('/', authn, authz(['CREATE_SUBMISSION']), async (req, res)
             res.status(202).location(`/api/submissions/${submission.id}`).json(submission)
 
             try {
-                const assignment = await readAssignmentById(assignmentsCollection(req), submission.assignmentId)
-                try {
-                    const course = await readCourseById(coursesCollection(req), assignment.courseId)
-                    try {
-                        const submissionResults = await runTests(randomString(), randomString(), assignment.name, req.githubUsername, course.githubRepoName, "ZdravkoGyurov", "grader-docker-tests", "./exec/.")
-                        submission.results =submissionResults
-                        submission.status = SubmissionStatus.DONE
-                        updateSubmission(submissionsCollection(req), submission.id, submission)
-                            .then(submission => {
-                                console.log(submission)
-                            })
-                            .catch (err => {
-                                console.error(err)
-                            })
-                    } catch (err) {
-                        console.error(err)
-                    }
-                } catch (err) {
-                    console.error(err)
-                }
+                submission = await testSubmission(req, submission)
             } catch (err) {
                 console.error(err)
             }
@@ -125,6 +106,18 @@ submissionRouter.delete('/:submissionId', authn, authz(['DELETE_SUBMISSION']), a
         sendErrorResponse(req, res, 500, `read from db failed`, err)
     }
 })
+
+async function testSubmission(req, submission) {
+    const assignment = await readAssignmentById(assignmentsCollection(req), submission.assignmentId)
+    const course = await readCourseById(coursesCollection(req), assignment.courseId)
+
+    const submissionResults = await runTests(randomString(), randomString(), assignment.name, req.githubUsername, course.githubRepoName, "ZdravkoGyurov", "grader-docker-tests", "./exec/.")
+    submission.results = submissionResults
+    submission.status = SubmissionStatus.DONE
+
+    const updatedSubmission = await updateSubmission(submissionsCollection(req), submission.id, submission)
+    return updatedSubmission
+}
 
 function coursesCollection(req) {
     return req.app.locals.db.collection('courses')

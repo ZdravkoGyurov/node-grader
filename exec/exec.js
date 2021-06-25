@@ -51,7 +51,15 @@ function buildDockerImage(imageName, assignment, solutionGitUser, solutionGitRep
 }
 
 function runDockerImage(containerName, imageName) {
-    return exec(`docker run --name ${containerName} ${imageName}`)
+    return new Promise((resolve, reject) => {
+        childProcess.exec(`docker run --name ${containerName} ${imageName}`, {}, (err, stdout, stderr) => {
+            if (err) {
+                console.log("stdout >>>", stdout)
+                console.log("stderr >>>", stderr)
+            }
+            return resolve(stdout)
+        })
+    })
 }
 
 function removeDockerContainer(containerName) {
@@ -66,7 +74,8 @@ function exec(command) {
     return new Promise((resolve, reject) => {
         childProcess.exec(command, {}, (err, stdout, stderr) => {
             if (err) {
-                console.log(stderr)
+                console.log("stdout >>>", stdout)
+                console.log("stderr >>>", stderr)
                 return reject(err)
             }
             return resolve(stdout)
