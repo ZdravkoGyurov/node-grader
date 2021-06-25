@@ -22,6 +22,34 @@ async function updateUser(collection, id, user) {
     return update(collection, filterById(id), user, entityName)
 }
 
+async function addUserPermissions(collection, id, permissions) {
+    const updateResult = await collection.updateOne(
+        filterById(id),
+        { $addToSet: { permissions: { $each: permissions } } }
+    )
+    
+    if (!updateResult.result.ok) {
+        throw Error(`failed to update ${entityName} in the database`)
+    }
+    if (!updateResult.matchedCount) {
+        throw Error(`failed to update ${entityName}, does not exist in the database`)
+    }
+}
+
+async function addUserCourse(collection, id, courseId) {
+    const updateResult = await collection.updateOne(
+        filterById(id),
+        { $addToSet: { courseIds: courseId } }
+    )
+
+    if (!updateResult.result.ok) {
+        throw Error(`failed to update ${entityName} in the database`)
+    }
+    if (!updateResult.matchedCount) {
+        throw Error(`failed to update ${entityName}, does not exist in the database`)
+    }
+}
+
 async function deleteUser(collection, id) {
     return deleteBy(collection, filterById(id), entityName)
 }
@@ -38,5 +66,7 @@ module.exports.createUser = createUser
 module.exports.readUsers = readUsers
 module.exports.readUserById = readUserById
 module.exports.readUserByUsername = readUserByUsername
+module.exports.addUserPermissions = addUserPermissions
+module.exports.addUserCourse = addUserCourse
 module.exports.updateUser = updateUser
 module.exports.deleteUser = deleteUser

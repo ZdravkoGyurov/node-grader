@@ -3,6 +3,7 @@ const { sendErrorResponse } = require("../errors")
 const { PermissionsRequest } = require("../models/permissionsRequest")
 const { isValidId, isExistingId } = require("../storage/db")
 const { createPermissionsRequest, readPermissionsRequests, deletePermissionsRequest, updatePermissionsRequest } = require("../storage/permissionsRequestStorage")
+const { addUserPermissions } = require("../storage/userStorage")
 const authn = require("../middleware/authn")
 const authz = require("../middleware/authz")
 const { RequestStatus } = require("../models/requestStatus")
@@ -70,6 +71,13 @@ permissionsRequestRouter.patch('/:permissionsRequestId', authn, authz(['UPDATE_P
 
         try {
             permissionsRequest = await updatePermissionsRequest(permissionsRequestsCollection(req), permissionsRequestId, permissionsRequest)
+            if (permissionsRequest.status === RequestStatus.APPROVED) {
+                try {
+                    await addUserPermissions(usersCollection(req), permissionsRequest.userId, permissionsRequest.permissions)
+                } catch (err) {
+                    return sendErrorResponse(req, res, 500, `failed to add permissions to user`, err)
+                }
+            }
             res.json(permissionsRequest)
         } catch (err) {
             const message = `error while updating permissionsRequest in the database`

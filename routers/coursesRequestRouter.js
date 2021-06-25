@@ -3,6 +3,7 @@ const { sendErrorResponse } = require("../errors")
 const { CoursesRequest } = require("../models/coursesRequest")
 const { isValidId, isExistingId } = require("../storage/db")
 const { createCoursesRequest, readCoursesRequests, deleteCoursesRequest, updateCoursesRequest } = require("../storage/coursesRequestStorage")
+const { addUserCourse } = require("../storage/userStorage")
 const authn = require("../middleware/authn")
 const authz = require("../middleware/authz")
 const { RequestStatus } = require("../models/requestStatus")
@@ -80,6 +81,13 @@ coursesRequestRouter.patch('/:coursesRequestId', authn, authz(['UPDATE_COURSESRE
 
         try {
             coursesRequest = await updateCoursesRequest(coursesRequestsCollection(req), coursesRequestId, coursesRequest)
+            if (coursesRequest.status === RequestStatus.APPROVED) {
+                try {
+                    await addUserCourse(usersCollection(req), coursesRequest.userId, coursesRequest.courseId)
+                } catch (err) {
+                    return sendErrorResponse(req, res, 500, `failed to add course to user`, err)
+                }
+            }
             res.json(coursesRequest)
         } catch (err) {
             const message = `error while updating coursesRequest in the database`

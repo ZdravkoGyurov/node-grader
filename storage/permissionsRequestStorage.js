@@ -14,7 +14,8 @@ async function readPermissionsRequests(collection, userId) {
 }
 
 async function updatePermissionsRequest(collection, id, permissionsRequest) {
-    return update(collection, filterById(id), permissionsRequest, entityName)
+    const filter = { _id: new ObjectID(id), status: { $eq: 'PENDING' } }
+    return update(collection, filter, permissionsRequest, entityName)
 }
 
 async function deletePermissionsRequest(collection, id) {

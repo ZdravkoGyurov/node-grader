@@ -63,7 +63,6 @@ submissionRouter.post('/', authn, authz(['CREATE_SUBMISSION']), async (req, res)
                     const course = await readCourseById(coursesCollection(req), assignment.courseId)
                     try {
                         const submissionResults = await runTests(randomString(), randomString(), assignment.name, req.githubUsername, course.githubRepoName, "ZdravkoGyurov", "grader-docker-tests", "./exec/.")
-                        console.log("submissionResults", submissionResults)
                         submission.results =submissionResults
                         submission.status = SubmissionStatus.DONE
                         updateSubmission(submissionsCollection(req), submission.id, submission)

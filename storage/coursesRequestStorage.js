@@ -14,7 +14,8 @@ async function readCoursesRequests(collection, userId) {
 }
 
 async function updateCoursesRequest(collection, id, coursesRequest) {
-    return update(collection, filterById(id), coursesRequest, entityName)
+    const filter = { _id: new ObjectID(id), status: { $eq: 'PENDING' } }
+    return update(collection, filter, coursesRequest, entityName)
 }
 
 async function deleteCoursesRequest(collection, id) {
