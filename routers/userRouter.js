@@ -79,7 +79,7 @@ userRouter.get('/:userId', authn, authz(['READ_USER']), async (req, res) => {
 userRouter.patch('/:userId', authn, authz(['UPDATE_USER']), async (req, res) => {
     const userId = req.params.userId
     const userBody = req.body
-
+    
     if(!isValidId(userId)) {
         return sendErrorResponse(req, res, 400, `invalid user data`, new Error('invalid user id'))
     }
@@ -91,7 +91,7 @@ userRouter.patch('/:userId', authn, authz(['UPDATE_USER']), async (req, res) => 
     }
 
     try {
-        const courseIds = userBody.courseIds.map(c => new ObjectID(c))
+        const courseIds = userBody.courseIds ? userBody.courseIds.map(c => new ObjectID(c)) : userBody.courseIds
         let user = new User(userBody.username, userBody.githubUsername, userBody.fullname,
             userBody.password, userBody.permissions, courseIds).removeEmptyFields()
         delete user.password
