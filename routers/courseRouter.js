@@ -2,15 +2,24 @@ const { Router } = require("express")
 const { sendErrorResponse } = require("../errors")
 const { Course } = require("../models/course")
 const { isValidId } = require("../storage/db")
-const { createCourse, readCourses, readCourseById, deleteCourse, updateCourse } = require("../storage/courseStorage")
+const { createCourse, readAllCourses, readCourses, readCourseById, deleteCourse, updateCourse } = require("../storage/courseStorage")
 const authn = require("../middleware/authn")
 const authz = require("../middleware/authz")
 
 const courseRouter = Router()
 
+courseRouter.get('/all', authn, authz(['READ_ALL_COURSES']), async (req, res) => {
+    try {
+        const courses = await readAllCourses(coursesCollection(req))
+        res.status(200).json(courses)
+    } catch (err) {
+        sendErrorResponse(req, res, 500, `Server error: ${err.message}`, err)
+    }
+})
+
 courseRouter.get('/', authn, authz(['READ_COURSES']), async (req, res) => {
     try {
-        const courses = await readCourses(coursesCollection(req))
+        const courses = await readCourses(coursesCollection(req), req.userCourses)
         res.status(200).json(courses)
     } catch (err) {
         sendErrorResponse(req, res, 500, `Server error: ${err.message}`, err)

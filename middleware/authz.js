@@ -27,6 +27,7 @@ module.exports = function authz(permissions) {
       }
 
       req.githubUsername = user.githubUsername
+      req.userCourses = user.courseIds
       next()
   })
   }
