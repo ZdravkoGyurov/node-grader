@@ -1,3 +1,36 @@
+const DEFAULT_PERMISSIONS = [
+    'READ_ASSIGNMENTS',
+    'READ_ASSIGNMENT',
+    'READ_ALL_COURSES',
+    'READ_COURSES',
+    'READ_COURSE',
+    'READ_COURSESREQUESTS',
+    'CREATE_COURSESREQUEST',
+    'DELETE_COURSESREQUEST',
+    'READ_PERMISSIONSREQUESTS',
+    'CREATE_PERMISSIONSREQUEST',
+    'DELETE_PERMISSIONSREQUEST',
+    'READ_SUBMISSIONS',
+    'CREATE_SUBMISSION',
+    'READ_SUBMISSION',
+    'DELETE_SUBMISSION',
+    // 'CREATE_ASSIGNMENT', // teacher + admin
+    // 'UPDATE_ASSIGNMENT', // teacher + admin
+    // 'DELETE_ASSIGNMENT', // teacher + admin
+    // 'CREATE_COURSE', // teacher + admin 
+    // 'UPDATE_COURSE', // teacher + admin
+    // 'DELETE_COURSE', // teacher + admin
+    // 'READ_ALL_COURSESREQUESTS', // admin
+    // 'UPDATE_COURSESREQUEST', // admin
+    // 'READ_ALL_PERMISSIONSREQUESTS', // admin
+    // 'UPDATE_PERMISSIONSREQUEST', // admin
+    // 'READ_ALL_SUBMISSIONS', // admin
+    // 'READ_USERS', // admin
+    // 'READ_USER', // admin
+    // 'UPDATE_USER', // admin
+    // 'DELETE_USER' // admin
+]
+
 const ALL_PERMISSIONS = [
     'READ_ASSIGNMENTS',
     'CREATE_ASSIGNMENT',
@@ -31,4 +64,5 @@ const ALL_PERMISSIONS = [
     'DELETE_USER'
 ]
 
+module.exports.DEFAULT_PERMISSIONS = DEFAULT_PERMISSIONS
 module.exports.ALL_PERMISSIONS = ALL_PERMISSIONS

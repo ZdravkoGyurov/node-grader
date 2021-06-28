@@ -7,7 +7,7 @@ const { isValidId, isExistingId } = require("../storage/db")
 const { createUser, readUsers, readUserById, deleteUser, updateUser } = require("../storage/userStorage")
 const authn = require("../middleware/authn")
 const authz = require("../middleware/authz")
-const { ALL_PERMISSIONS } = require("../models/permissions")
+const { DEFAULT_PERMISSIONS } = require("../models/permissions")
 const { ObjectID } = require("bson")
 
 const userRouter = Router()
@@ -31,7 +31,7 @@ userRouter.post('/', async (req, res) => {
     try {
         let user = new User(userBody.username, userBody.githubUsername, userBody.fullname, userBody.password)
         user.validate()
-        user.permissions = ALL_PERMISSIONS
+        user.permissions = DEFAULT_PERMISSIONS
         user.courseIds = []
 
         try {
