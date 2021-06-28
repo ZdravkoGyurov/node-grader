@@ -24,12 +24,13 @@ submissionRouter.get('/all', authn, authz(['READ_ALL_SUBMISSIONS']), async (req,
 submissionRouter.get('/', authn, authz(['READ_SUBMISSIONS']), async (req, res) => {
     const body = req.body
 
-    if (!isValidId(body.assignmentId)) {
+    const assignmentId = req.query.assignmentId
+    if (!isValidId(assignmentId)) {
         return sendErrorResponse(req, res, 400, `assignmentId is invalid`)
     }
 
     try {
-        const submissions = await readSubmissions(submissionsCollection(req), req.userId, body.assignmentId)
+        const submissions = await readSubmissions(submissionsCollection(req), req.userId, assignmentId)
         res.status(200).json(submissions)
     } catch (err) {
         sendErrorResponse(req, res, 500, `read from db failed`, err)
