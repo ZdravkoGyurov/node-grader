@@ -83,6 +83,7 @@ assignmentRouter.patch('/:assignmentId', authn, authz(['UPDATE_ASSIGNMENT']), as
     try {
         let assignment = new Assignment(assignmentBody.name, assignmentBody.description, assignmentBody.dueDate, new ObjectID(assignmentBody.courseId)).removeEmptyFields()
         assignment.validatePatch()
+        delete assignment.courseId
 
         try {
             assignment = await updateAssignment(assignmentsCollection(req), assignmentId, assignment)
